@@ -8,7 +8,7 @@ namespace Garage2.Models
         public int Id { get; set; }
 
         [Display(Name = "Vehicle type")]
-        [Required(ErrorMessage = "Vehicle type is required")]
+        [Required(ErrorMessage = "Vehicle type is required")] //[EnumDataType(typeof(Types), ErrorMessage = "Vehicle type is required")]
         public Types Type { get; set; }
 
         [Display(Name = "Registration number")]
