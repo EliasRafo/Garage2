@@ -14,7 +14,9 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Type" class="control-label"></label>
-                <select asp-for="Type" class="form-control"></select>
+                <select class="form-control" name="Type" asp-items="@Html.GetEnumSelectList<Types>()">
+                    <option selected="selected" value="">Select vehicle</option>
+                </select>
                 <span asp-validation-for="Type" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -42,13 +44,9 @@
                 <input asp-for="WheelsNumber" class="form-control" />
                 <span asp-validation-for="WheelsNumber" class="text-danger"></span>
             </div>
+
             <div class="form-group">
-                <label asp-for="ParkingTime" class="control-label"></label>
-                <input asp-for="ParkingTime" class="form-control" />
-                <span asp-validation-for="ParkingTime" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <input type="submit" value="Park" class="btn btn-primary" />
             </div>
         </form>
     </div>

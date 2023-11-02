@@ -36,7 +36,7 @@ namespace Garage2.Models
         [Required(ErrorMessage = "Wheels Number is required")]
         [Range(0, 12)]
         public int WheelsNumber { get; set; }
-
+        // Change display name for time? Discuss.
         [Display(Name = "ParkingTime")]
         public DateTime ParkingTime { get; set; }
     }

@@ -37,6 +37,8 @@ namespace Garage2.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Park(Vehicle vehicle)
         {
+            vehicle.ParkingTime = DateTime.Now;
+
             if (ModelState.IsValid)
             {
                 _context.Add(vehicle);
