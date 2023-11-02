@@ -27,7 +27,25 @@ namespace Garage2.Controllers
                           Problem("Entity set 'Garage2Context.Vehicle'  is null.");
         }
 
-        
+        [HttpGet]
+        public IActionResult Park()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Park(Vehicle vehicle)
+        {
+            if (ModelState.IsValid)
+            {
+                _context.Add(vehicle);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+
+            return View(vehicle);
+        }
 
     }
 }
