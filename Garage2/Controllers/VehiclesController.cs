@@ -41,12 +41,26 @@ namespace Garage2.Controllers
 
             if (ModelState.IsValid)
             {
-                _context.Add(vehicle);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                if(!VehicleExists(vehicle))
+                {
+                    _context.Add(vehicle);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+                else
+                {
+                    //Replace with alert?
+                    return NotFound();
+                }
+                
             }
 
             return View(vehicle);
+        }
+
+        private bool VehicleExists(Vehicle vehicle)
+        {
+            return (_context.Vehicle?.Any(e => e.RegNum == vehicle.RegNum)).GetValueOrDefault();
         }
 
     }
