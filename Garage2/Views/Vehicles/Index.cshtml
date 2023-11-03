@@ -4,33 +4,33 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<h1>Garage</h1>
+
+@if (@TempData["AlertMessage"] != null)
+{
+    <div class="alert">
+        @TempData["AlertMessage"];
+    </div>
+}
+
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Parking">Parking a vehicle</a>
 </p>
+
 <table class="table">
     <thead>
         <tr>
             <th>
+                @Html.ActionLink("⇵", "Sort", new { sortOrder = ViewBag.TypeSortParm })
                 @Html.DisplayNameFor(model => model.Type)
             </th>
             <th>
+                @Html.ActionLink("⇵", "Sort", new { sortOrder = ViewBag.RegNumSortParm })
                 @Html.DisplayNameFor(model => model.RegNum)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Color)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Brand)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Model)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.WheelsNumber)
-            </th>
-            <th>
+                @Html.ActionLink("⇵", "Sort", new { sortOrder = ViewBag.ParkingTimeSortParm })
                 @Html.DisplayNameFor(model => model.ParkingTime)
             </th>
             <th></th>
@@ -46,24 +46,12 @@
                 @Html.DisplayFor(modelItem => item.RegNum)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Color)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Brand)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Model)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.WheelsNumber)
-            </td>
-            <td>
                 @Html.DisplayFor(modelItem => item.ParkingTime)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                <a asp-action="Unparking" asp-route-id="@item.Id">Unparking the vehicle</a>
             </td>
         </tr>
 }
