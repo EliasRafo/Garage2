@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Garage2.Data;
 using Garage2.Models;
+using Garage2.Models.ViewModels;
+using Newtonsoft.Json;
+using static Azure.Core.HttpHeader;
 
 namespace Garage2.Controllers
 {
@@ -22,12 +25,20 @@ namespace Garage2.Controllers
         // GET: Vehicles
         public async Task<IActionResult> Index()
         {
-              return _context.Vehicle != null ? 
-                          View(await _context.Vehicle.ToListAsync()) :
-                          Problem("Entity set 'Garage2Context.Vehicle'  is null.");
+            if (_context.Vehicle != null)
+            {
+                return View(await _context.Vehicle.ToListAsync());
+            }
+            else
+            {
+                Feedback feedback = new Feedback() { status = "error", message = "Entity set 'Garage2Context.Vehicle'  is null." };
+                TempData["AlertMessage"] = JsonConvert.SerializeObject(feedback);
+
+                return View();
+            }
         }
 
-        // GET: Vehicles
+        // GET: Sort
         public async Task<IActionResult> Sort(string sortOrder)
         {
 
@@ -73,9 +84,17 @@ namespace Garage2.Controllers
                     break;
             }
 
-            return vehicles != null ?
-                          View("Index", vehicles) :
-                          Problem("Entity set 'Garage2Context.Vehicle'  is null.");
+            if (vehicles != null)
+            {
+                return View("Index", vehicles);
+            }
+            else
+            {
+                Feedback feedback = new Feedback() { status = "error", message = "Entity set 'Garage2Context.Vehicle'  is null." };
+                TempData["AlertMessage"] = JsonConvert.SerializeObject(feedback);
+
+                return View("Index");
+            }
         }
 
         // GET: Vehicles/Unparking/5
@@ -83,14 +102,20 @@ namespace Garage2.Controllers
         {
             if (id == null || _context.Vehicle == null)
             {
-                return NotFound();
+                Feedback feedback = new Feedback() { status = "error", message = "Vehicle not found." };
+                TempData["AlertMessage"] = JsonConvert.SerializeObject(feedback);
+
+                return View("Index");
             }
 
             var vehicle = await _context.Vehicle
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (vehicle == null)
             {
-                return NotFound();
+                Feedback feedback = new Feedback() { status = "error", message = "Vehicle not found." };
+                TempData["AlertMessage"] = JsonConvert.SerializeObject(feedback);
+
+                return View("Index");
             }
 
             return View(vehicle);
@@ -103,7 +128,9 @@ namespace Garage2.Controllers
         {
             if (_context.Vehicle == null)
             {
-                return Problem("Entity set 'Garage2Context.Vehicle'  is null.");
+                Feedback feedback = new Feedback() { status = "error", message = "Entity set 'Garage2Context.Vehicle'  is null." };
+                TempData["AlertMessage"] = JsonConvert.SerializeObject(feedback);
+                return View("Index");
             }
             var vehicle = await _context.Vehicle.FindAsync(id);
             if (vehicle != null)
@@ -111,13 +138,29 @@ namespace Garage2.Controllers
                 _context.Vehicle.Remove(vehicle);
                 await _context.SaveChangesAsync();
 
-                TempData["AlertMessage"] = "Vehicle unparking successfully";
+                Feedback feedback = new Feedback() { status="ok", message= "Vehicle unparkered successfully." };
+                TempData["AlertMessage"] = JsonConvert.SerializeObject(feedback);
+
+                DateTime CheckOut = DateTime.Now;
+
+                TimeSpan duration = CheckOut - vehicle.ParkingTime;
+
+                var pr = Math.Floor(duration.TotalMinutes * 1);
+
+                var model = new ReceiptViewModel()
+                {
+                    Vehicle = vehicle,
+                    CheckOutTime = CheckOut,
+                    ParkingPeriod = $"{duration.Days} Days, {duration.Hours} Hours, {duration.Minutes} Minutes",
+                    Price = $"{pr} SEK"
+                };
+
+                return View("Receipt", model);
             }
 
             return RedirectToAction(nameof(Index));
         }
 
-
-
+        
     }
 }
