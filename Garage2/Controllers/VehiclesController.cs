@@ -63,8 +63,7 @@ namespace Garage2.Controllers
 
         [HttpGet]
         //Under development
-        //been moved in to methods:
-        //Create Model Properties for search
+        // Investigate use of async for this action.
         public async Task<IActionResult> Search(string vehicleProp)
         {
             var vehicles =  Searchmatch(vehicleProp);
