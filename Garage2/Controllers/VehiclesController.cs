@@ -9,6 +9,7 @@ using Garage2.Data;
 using Garage2.Models;
 using Humanizer;
 using System.ComponentModel;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 
 namespace Garage2.Controllers
 {
@@ -66,17 +67,13 @@ namespace Garage2.Controllers
         //Create Model Properties for search
         public async Task<IActionResult> Search(string vehicleProp)
         {
-            //if (vehicleProp == null || _context.Vehicle == null)
+            var vehicles =  Searchmatch(vehicleProp);
+            //if (vehicleProp == null || _context.Vehicle == null || vehicles == null)
             //{
             //    return NotFound();
             //}
-            // Under Development:
-            var ContextVehicles = await _context.Vehicle.ToListAsync();
-            IEnumerable<Vehicle> vehicles = ContextVehicles
-                .Where(p => p.ToString() == vehicleProp);
-            
 
-            return View(vehicles);
+            return View(vehicles.ToList());
         }
 
         private bool VehicleExists(Vehicle vehicle)
@@ -84,7 +81,80 @@ namespace Garage2.Controllers
             return (_context.Vehicle?.Any(e => e.RegNum == vehicle.RegNum)).GetValueOrDefault();
         }
 
-        private List<Vehicle>Searchmatch()
+        // Change to async
+        private List<Vehicle> Searchmatch(string searchInput)
+        {
+            var contextVehicles =  _context.Vehicle.ToList();
+
+            int searchInpuInt;
+            Types searchType;
+
+            List<Vehicle>? vehicles = null;
+            List < Vehicle >? vehiclesInt = null;
+            List<Vehicle>? vehiclesString = null; //Brand, Color, RegNum Model
+            List<Vehicle>? vehiclesType = null;
+            //Add search, time of parking event.
+            //List<Vehicle>? vehiclesDateTime = null;
+
+            bool isInt = int.TryParse(searchInput, out searchInpuInt);
+            
+            if(isInt)
+            {
+
+                vehiclesInt = contextVehicles
+                   .Where(s => s.WheelsNumber == searchInpuInt ||
+                               s.Id == searchInpuInt).ToList();
+            }
+
+            vehiclesString = contextVehicles
+                   .Where(s => s.Brand == searchInput ||
+                               s.Color == searchInput ||
+                               s.Model == searchInput ||
+                               s.RegNum == searchInput).ToList();
+
+            if (Enum.TryParse<Types>(searchInput, true, out searchType))  // ignore cases
+            {
+                vehiclesType = contextVehicles
+                       .Where(s => s.Type == searchType).ToList();
+            }
+
+            if (vehiclesInt != null)
+            {
+                vehicles = vehiclesInt;
+            }
+
+            if (vehiclesString != null) 
+            {
+                if(vehicles!= null)
+                {
+                    vehicles.AddRange(vehiclesString);
+                }
+                else
+                {
+                    vehicles = vehiclesString;
+                }
+            }
+
+            if (vehiclesType != null)
+            {
+                if (vehicles != null)
+                {
+                    vehicles.AddRange(vehiclesType);
+                }
+                else
+                {
+                    vehicles = vehiclesType;
+                }
+            }
+
+
+            //int
+            //datetime
+            //Types
+            //String
+
+            return vehicles;
+        }
 
     }
 }
