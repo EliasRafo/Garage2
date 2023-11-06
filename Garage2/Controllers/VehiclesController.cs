@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Garage2.Data;
 using Garage2.Models;
+using Humanizer;
+using System.ComponentModel;
 
 namespace Garage2.Controllers
 {
@@ -58,10 +60,31 @@ namespace Garage2.Controllers
             return View(vehicle);
         }
 
+        [HttpGet]
+        //Under development
+        //been moved in to methods:
+        //Create Model Properties for search
+        public async Task<IActionResult> Search(string vehicleProp)
+        {
+            //if (vehicleProp == null || _context.Vehicle == null)
+            //{
+            //    return NotFound();
+            //}
+            // Under Development:
+            var ContextVehicles = await _context.Vehicle.ToListAsync();
+            IEnumerable<Vehicle> vehicles = ContextVehicles
+                .Where(p => p.ToString() == vehicleProp);
+            
+
+            return View(vehicles);
+        }
+
         private bool VehicleExists(Vehicle vehicle)
         {
             return (_context.Vehicle?.Any(e => e.RegNum == vehicle.RegNum)).GetValueOrDefault();
         }
+
+        private List<Vehicle>Searchmatch()
 
     }
 }
