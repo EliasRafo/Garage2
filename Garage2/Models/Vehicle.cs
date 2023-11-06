@@ -6,9 +6,9 @@ namespace Garage2.Models
     {
         [Key]
         public int Id { get; set; }
-
+        //Should we use Type or string, what is best practise for SQL? Discuss.
         [Display(Name = "Vehicle type")]
-        [Required(ErrorMessage = "Vehicle type is required")]
+        [Required(ErrorMessage = "Vehicle type is required")] //[EnumDataType(typeof(Types), ErrorMessage = "Vehicle type is required")]
         public Types Type { get; set; }
 
         [Display(Name = "Registration number")]
@@ -36,8 +36,8 @@ namespace Garage2.Models
         [Required(ErrorMessage = "Wheels Number is required")]
         [Range(0, 12)]
         public int WheelsNumber { get; set; }
-
-        [Display(Name = "ParkingTime")]
+        
+        [Display(Name = "Time for parking the vehicle")]
         public DateTime ParkingTime { get; set; }
     }
 }
