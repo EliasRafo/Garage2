@@ -11,11 +11,15 @@
     string message = TempData["AlertMessage"].ToString();
     <message message="@message"></message>
 }
-
-
-<p>
-    <a asp-action="Park">Park vehicle</a>
-</p>
+    <form asp-action="Search" method="get">
+        <div class="form-group">
+            <P> Search </P>
+            <input type="text" name="vehicleProp" class="form-control" />
+        </div>
+        <div class="form-group">
+            <input type="submit" value="Search" class="btn btn-primary" />
+        </div>
+    </form>
 
     <partial name="VehiclePartial"/>
 

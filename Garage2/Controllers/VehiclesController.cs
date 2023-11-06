@@ -187,8 +187,8 @@ namespace Garage2.Controllers
                 }
                 else
                 {
-                    //Replace with alert?
-                    return NotFound();
+                    Feedback feedback = new Feedback() { status = "ok", message = "Vehicle already exist in the garage." };
+                    TempData["AlertMessage"] = JsonConvert.SerializeObject(feedback);
                 }
                 
             }
@@ -197,17 +197,29 @@ namespace Garage2.Controllers
         }
 
         [HttpGet]
-        //Under development
         // Investigate use of async for this action.
         public async Task<IActionResult> Search(string vehicleProp)
         {
-            var vehicles =  Searchmatch(vehicleProp);
-            //if (vehicleProp == null || _context.Vehicle == null || vehicles == null)
-            //{
-            //    return NotFound();
-            //}
 
-            return View(vehicles.ToList());
+            if ( vehicleProp == null || _context.Vehicle == null)
+            {
+                vehicleProp = string.Empty;
+                Feedback feedback = new Feedback() { status = "ok", message = $"No Match found for \"{vehicleProp}\"." };
+                TempData["AlertMessage"] = JsonConvert.SerializeObject(feedback);
+                return View(nameof(Index));
+            }
+
+            var vehicles = Searchmatch(vehicleProp);
+
+            if (vehicles.Count == 0)
+            {
+                
+                Feedback feedback = new Feedback() { status = "ok", message = $"No Match found for \"{vehicleProp}\"." };
+                TempData["AlertMessage"] = JsonConvert.SerializeObject(feedback);
+                return View(nameof(Index));
+            }
+
+            return View(nameof(Index), vehicles.ToList());
         }
 
         private bool VehicleExists(Vehicle vehicle)
@@ -219,6 +231,11 @@ namespace Garage2.Controllers
         private List<Vehicle> Searchmatch(string searchInput)
         {
             var contextVehicles =  _context.Vehicle.ToList();
+
+            if (searchInput == null)
+            {
+                return null!;
+            }
 
             int searchInpuInt;
             Types searchType;
@@ -241,10 +258,10 @@ namespace Garage2.Controllers
             }
 
             vehiclesString = contextVehicles
-                   .Where(s => s.Brand == searchInput ||
-                               s.Color == searchInput ||
-                               s.Model == searchInput ||
-                               s.RegNum == searchInput).ToList();
+                   .Where(s => s.Brand.ToUpper() == searchInput.ToUpper() ||
+                               s.Color.ToUpper() == searchInput.ToUpper() ||
+                               s.Model.ToUpper() == searchInput.ToUpper() ||
+                               s.RegNum.ToUpper() == searchInput.ToUpper()).ToList();
 
             if (Enum.TryParse<Types>(searchInput, true, out searchType))  // ignore cases
             {
