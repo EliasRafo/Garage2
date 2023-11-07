@@ -1,0 +1,62 @@
+﻿@model Garage2.Models.ViewModels.OverviewViewModel
+
+@{
+    ViewData["Title"] = "Overview";
+}
+
+<h1>Overview</h1>
+
+<div>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Capacity)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Capacity)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.FreeSpaces)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.FreeSpaces)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.VehiclesStatistic)
+        </dt>
+        <dd class="col-sm-10">
+            <ul>
+                @if (Model.VehiclesStatistic is not null)
+                {
+                    @foreach (var item in Model.VehiclesStatistic)
+                    {
+                        <li>@string.Format("Vehicle: {0}, Total={1}", @item.Name, @item.Total)</li>
+                    }
+                }
+                else
+                {
+                    <li>No vehicles found</li>
+                }
+                
+
+            </ul>
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.WheelsNumber)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.WheelsNumber)
+        </dd>
+
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Revenues)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Revenues) SEK
+        </dd>
+    </dl>
+</div>
+<div>
+    <input type="button" value="Print" class="btn btn-success" onclick="printPage()" />
+    <a asp-action="Index">Back to List</a>
+</div>
