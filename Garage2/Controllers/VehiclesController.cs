@@ -79,6 +79,14 @@ namespace Garage2.Controllers
 
             if (ModelState.IsValid)
             {
+                var vehicleInDb = await _context.Vehicle.AsNoTracking().SingleOrDefaultAsync(v => v.Id == vehicle.Id);
+                if (vehicleInDb == null)
+                {
+                    return NotFound();
+                }
+
+                vehicle.ParkingTime = vehicleInDb.ParkingTime;
+
                 try
                 {
                     _context.Update(vehicle);
