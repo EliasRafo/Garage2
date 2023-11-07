@@ -4,79 +4,24 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<h1>Garage</h1>
 
-<p>
-    <a asp-action="Park">Park vehicle</a>
-</p>
-
-<form asp-action="Search" method="get">
-    <div class="form-group">
-        <P> Search for parked vehicles </P>
-        <input type="text" name="vehicleProp" class="form-control" />
-    </div>
-    <div class="form-group">
-        <input type="submit" value="Search" class="btn btn-primary" />
-    </div>
-</form>
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Type)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.RegNum)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Color)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Brand)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Model)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.WheelsNumber)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ParkingTime)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Type)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.RegNum)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Color)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Brand)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Model)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.WheelsNumber)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ParkingTime)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
+@if (@TempData["AlertMessage"] != null)
+{
+    string message = TempData["AlertMessage"].ToString();
+    <message message="@message"></message>
 }
-    </tbody>
-</table>
+    <a asp-action="Park">Park vehicle</a>
+
+    <form asp-action="Search" method="get">
+        <div class="form-group">
+            <P> Search </P>
+            <input type="text" name="vehicleProp" class="form-control" />
+        </div>
+        <div class="form-group">
+            <input type="submit" value="Search" class="btn btn-primary" />
+        </div>
+    </form>
+
+    <partial name="VehiclePartial"/>
+

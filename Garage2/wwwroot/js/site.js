@@ -2,3 +2,11 @@
 // for details on configuring this project to bundle and minify static web assets.
 
 // Write your JavaScript code.
+$(function () {
+    setTimeout(function () { $("#hideDiv").fadeOut(1500); }, 5000)
+
+})
+
+function printPage() {
+    window.print();
+}

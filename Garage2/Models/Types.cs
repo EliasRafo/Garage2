@@ -5,18 +5,18 @@ namespace Garage2.Models
     public enum Types
     {
         [Display(Name = "Car")]
-        Car,
+        Car = 4,
 
         [Display(Name = "Bus")]
-        Bus,
+        Bus = 3,
 
         [Display(Name = "Boat")]
-        Boat,
+        Boat = 2,
 
         [Display(Name = "Airplane")]
-        Airplane,
+        Airplane = 1,
 
         [Display(Name = "Motorcycle")]
-        Motorcycle
+        Motorcycle = 5
     }
 }
