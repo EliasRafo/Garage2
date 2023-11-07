@@ -13,6 +13,8 @@ using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using Garage2.Models.ViewModels;
 using Newtonsoft.Json;
 using static Azure.Core.HttpHeader;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Garage2.Controllers
 {
@@ -197,7 +199,6 @@ namespace Garage2.Controllers
         }
 
         [HttpGet]
-        // Investigate use of async for this action.
         public async Task<IActionResult> Search(string vehicleProp)
         {
 
@@ -209,7 +210,7 @@ namespace Garage2.Controllers
                 return View(nameof(Index));
             }
 
-            var vehicles = Searchmatch(vehicleProp);
+            var vehicles = await SearchMatchAsync(vehicleProp);
 
             if (vehicles.Count == 0)
             {
@@ -227,84 +228,38 @@ namespace Garage2.Controllers
             return (_context.Vehicle?.Any(e => e.RegNum == vehicle.RegNum)).GetValueOrDefault();
         }
 
-        // Change to async
-        private List<Vehicle> Searchmatch(string searchInput)
+        private async Task <List<Vehicle>> SearchMatchAsync(string searchInput)
         {
-            var contextVehicles =  _context.Vehicle.ToList();
 
-            if (searchInput == null)
-            {
-                return null!;
-            }
-
-            int searchInpuInt;
-            Types searchType;
-
-            List<Vehicle>? vehicles = null;
-            List < Vehicle >? vehiclesInt = null;
-            List<Vehicle>? vehiclesString = null; //Brand, Color, RegNum Model
-            List<Vehicle>? vehiclesType = null;
-            //Add search, time of parking event.
-            //List<Vehicle>? vehiclesDateTime = null;
-
-            bool isInt = int.TryParse(searchInput, out searchInpuInt);
+            ArgumentNullException.ThrowIfNull(searchInput, nameof(searchInput));
             
-            if(isInt)
-            {
-
-                vehiclesInt = contextVehicles
-                   .Where(s => s.WheelsNumber == searchInpuInt ||
-                               s.Id == searchInpuInt).ToList();
-            }
-
-            vehiclesString = contextVehicles
-                   .Where(s => s.Brand.ToUpper() == searchInput.ToUpper() ||
-                               s.Color.ToUpper() == searchInput.ToUpper() ||
-                               s.Model.ToUpper() == searchInput.ToUpper() ||
-                               s.RegNum.ToUpper() == searchInput.ToUpper()).ToList();
-
-            if (Enum.TryParse<Types>(searchInput, true, out searchType))  // ignore cases
-            {
-                vehiclesType = contextVehicles
-                       .Where(s => s.Type == searchType).ToList();
-            }
-
-            if (vehiclesInt != null)
-            {
-                vehicles = vehiclesInt;
-            }
-
-            if (vehiclesString != null) 
-            {
-                if(vehicles!= null)
-                {
-                    vehicles.AddRange(vehiclesString);
-                }
-                else
-                {
-                    vehicles = vehiclesString;
-                }
-            }
-
-            if (vehiclesType != null)
-            {
-                if (vehicles != null)
-                {
-                    vehicles.AddRange(vehiclesType);
-                }
-                else
-                {
-                    vehicles = vehiclesType;
-                }
-            }
+            var searchInputs = searchInput.Split(' ');
+            //change to try parse
+            int[] searchInputsInt = searchInput.Split(' ').Select(int.Parse).ToArray();
 
 
-            //int
-            //datetime
-            //Types
-            //String
+            int.TryParse(searchInput,out int searchInt);
+            
+            return await _context.Vehicle
+       .Where(s => s.Brand == searchInput ||
+                   s.Color == searchInput ||
+                   s.Model == searchInput ||
+                   s.RegNum == searchInput ||
+                   searchInputsInt.Any(x => s.WheelsNumber == x) ||
+                   // s.Id == searchInt ||
+                   //(int)s.Type == searchInt).ToListAsync();
+                   searchInputsInt.Any(x => (int)s.Type == x) ||
+                  searchInputsInt.Any(x => s.Id == x)).ToListAsync();
 
-            return vehicles;
+            //return await _context.Vehicle
+            //       .Where(s => s.Brand == searchInput ||
+            //                   s.Color == searchInput ||
+            //                   s.Model == searchInput ||
+            //                   s.RegNum == searchInput ||
+            //                   s.WheelsNumber == searchInt ||
+            //                   s.Id == searchInt ||
+            //                   (int)s.Type == searchInt).ToListAsync();
+
         }
 
     }
