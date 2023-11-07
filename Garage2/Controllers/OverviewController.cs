@@ -21,7 +21,7 @@ namespace Garage2.Controllers
             _iConfig = iConfig;
         }
 
-        public async Task<IActionResult> Index2()
+        public async Task<IActionResult> Index()
         {
             OverviewViewModel overviewViewModel = new OverviewViewModel();
 
