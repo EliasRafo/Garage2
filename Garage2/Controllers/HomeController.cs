@@ -18,6 +18,13 @@ namespace Garage2.Controllers
             return View();
         }
 
+        public IActionResult Park(Vehicle vehicle)
+        {
+
+
+            return View();
+        }
+
         public IActionResult Privacy()
         {
             return View();
