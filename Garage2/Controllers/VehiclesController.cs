@@ -25,7 +25,6 @@ namespace Garage2.Controllers
             _context = context;
         }
 
-        // GET: Vehicles
         public async Task<IActionResult> Index()
         {
             if (_context.Vehicle != null)
@@ -40,6 +39,76 @@ namespace Garage2.Controllers
                 return View();
             }
         }
+
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
+                return StatusCode(StatusCodes.Status400BadRequest);
+            }
+            var vehicle = await _context.Vehicle.FindAsync(id);
+            if (vehicle == null)
+            {
+                return NotFound();
+            }
+            return View(vehicle);
+        }
+
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null)
+            {
+                return StatusCode(StatusCodes.Status400BadRequest);
+            }
+            var vehicle = await _context.Vehicle.FindAsync(id);
+            if (vehicle == null)
+            {
+                return NotFound();
+            }
+            return View(vehicle);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Type,RegNum,Color,Brand,Model,WheelsNumber")] Vehicle vehicle)
+        {
+            if (id != vehicle.Id)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                var vehicleInDb = await _context.Vehicle.AsNoTracking().SingleOrDefaultAsync(v => v.Id == vehicle.Id);
+                if (vehicleInDb == null)
+                {
+                    return NotFound();
+                }
+
+                vehicle.ParkingTime = vehicleInDb.ParkingTime;
+
+                try
+                {
+                    _context.Update(vehicle);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!_context.Vehicle.Any(e => e.Id == vehicle.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            return View(vehicle);
+        }
+           
+             
 
         // GET: Sort
         public async Task<IActionResult> Sort(string sortOrder)
@@ -301,11 +370,7 @@ namespace Garage2.Controllers
             }
 
 
-            //int
-            //datetime
-            //Types
-            //String
-
+            
             return vehicles;
         }
 
