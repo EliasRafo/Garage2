@@ -25,9 +25,80 @@ namespace Garage2.Controllers
             _context = context;
         }
 
-        // GET: Vehicles
         public async Task<IActionResult> Index()
         {
+            if (_context.Vehicle != null)
+            {
+                return View(await _context.Vehicle.ToListAsync());
+            }
+            else
+            {
+                Feedback feedback = new Feedback() { status = "error", message = "Entity set 'Garage2Context.Vehicle'  is null." };
+                TempData["AlertMessage"] = JsonConvert.SerializeObject(feedback);
+
+                return View();
+            }
+        }
+
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
+                return StatusCode(StatusCodes.Status400BadRequest);
+            }
+            var vehicle = await _context.Vehicle.FindAsync(id);
+            if (vehicle == null)
+            {
+                return NotFound();
+            }
+            return View(vehicle);
+        }
+
+              public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null)
+            {
+                return StatusCode(StatusCodes.Status400BadRequest);
+            }
+            var vehicle = await _context.Vehicle.FindAsync(id);
+            if (vehicle == null)
+            {
+                return NotFound();
+            }
+            return View(vehicle);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Type,RegNum,Color,Brand,Model,WheelsNumber")] Vehicle vehicle)
+        {
+            if (id != vehicle.Id)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Update(vehicle);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!_context.Vehicle.Any(e => e.Id == vehicle.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            return View(vehicle);
+        }
             if (_context.Vehicle != null)
             {
                 return View(await _context.Vehicle.ToListAsync());
@@ -299,11 +370,7 @@ namespace Garage2.Controllers
             }
 
 
-            //int
-            //datetime
-            //Types
-            //String
-
+            
             return vehicles;
         }
 
