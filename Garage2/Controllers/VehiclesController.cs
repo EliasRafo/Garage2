@@ -54,7 +54,7 @@ namespace Garage2.Controllers
             return View(vehicle);
         }
 
-              public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
             {
@@ -99,18 +99,8 @@ namespace Garage2.Controllers
             }
             return View(vehicle);
         }
-            if (_context.Vehicle != null)
-            {
-                return View(await _context.Vehicle.ToListAsync());
-            }
-            else
-            {
-                Feedback feedback = new Feedback() { status = "error", message = "Entity set 'Garage2Context.Vehicle'  is null." };
-                TempData["AlertMessage"] = JsonConvert.SerializeObject(feedback);
-
-                return View();
-            }
-        }
+           
+             
 
         // GET: Sort
         public async Task<IActionResult> Sort(string sortOrder)
