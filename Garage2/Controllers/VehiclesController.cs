@@ -74,14 +74,14 @@ namespace Garage2.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Type,RegNum,Color,Brand,Model,WheelsNumber")] Vehicle vehicle)
         {
-            if (id != vehicle.Id)
+            if (id != vehicle.VehicleId)
             {
                 return NotFound();
             }
 
             if (ModelState.IsValid)
             {
-                var vehicleInDb = await _context.Vehicle.AsNoTracking().SingleOrDefaultAsync(v => v.Id == vehicle.Id);
+                var vehicleInDb = await _context.Vehicle.AsNoTracking().SingleOrDefaultAsync(v => v.VehicleId == vehicle.VehicleId);
                 if (vehicleInDb == null)
                 {
                     return NotFound();
@@ -96,7 +96,7 @@ namespace Garage2.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!_context.Vehicle.Any(e => e.Id == vehicle.Id))
+                    if (!_context.Vehicle.Any(e => e.VehicleId == vehicle.VehicleId))
                     {
                         return NotFound();
                     }
@@ -316,56 +316,6 @@ namespace Garage2.Controllers
                                s.WheelsNumber == searchInt ||
                                s.VehicleId == searchInt ||
                                (int)s.Type == searchInt).ToListAsync();
-
-                vehiclesInt = contextVehicles
-                   .Where(s => s.WheelsNumber == searchInpuInt ||
-                               s.Id == searchInpuInt).ToList();
-            }
-
-            vehiclesString = contextVehicles
-                   .Where(s => s.Brand.ToUpper() == searchInput.ToUpper() ||
-                               s.Color.ToUpper() == searchInput.ToUpper() ||
-                               s.Model.ToUpper() == searchInput.ToUpper() ||
-                               s.RegNum.ToUpper() == searchInput.ToUpper()).ToList();
-
-            if (Enum.TryParse<Types>(searchInput, true, out searchType))  // ignore cases
-            {
-                vehiclesType = contextVehicles
-                       .Where(s => s.Type == searchType).ToList();
-            }
-
-            if (vehiclesInt != null)
-            {
-                vehicles = vehiclesInt;
-            }
-
-            if (vehiclesString != null) 
-            {
-                if(vehicles!= null)
-                {
-                    vehicles.AddRange(vehiclesString);
-                }
-                else
-                {
-                    vehicles = vehiclesString;
-                }
-            }
-
-            if (vehiclesType != null)
-            {
-                if (vehicles != null)
-                {
-                    vehicles.AddRange(vehiclesType);
-                }
-                else
-                {
-                    vehicles = vehiclesType;
-                }
-            }
-
-
-            
-            return vehicles;
         }
 
     }
