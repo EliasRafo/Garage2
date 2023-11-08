@@ -48,7 +48,7 @@ namespace Garage2.TagHelpers
                 builder.Append($"</li>");
                 builder.Append($"</ul>");
                     builder.Append($"</div>");
-                    builder.Append($"<div class='text-center'><a asp-controller='Vehicles' asp-action='Unparking' asp-route-id='{parkingSpace.Vehicle.Id}'>Unparking</a></div>");
+                    builder.Append($"<div class='text-center'><a asp-controller='Vehicles' asp-action='Unparking' asp-route-id='{parkingSpace.Vehicle.VehicleId}'>Unparking</a></div>");
 
                     builder.Append($"</div>");
                 builder.Append($"</div>");
