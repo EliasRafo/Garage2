@@ -235,21 +235,21 @@ namespace Garage2.Controllers
             
             var searchInputs = searchInput.Split(' ');
             //change to try parse
-            int[] searchInputsInt = searchInput.Split(' ').Select(int.Parse).ToArray();
-
+            //int[] searchInputsInt = searchInput.Split(' ').Select(int.Parse).ToArray();
+            var searchInputsInt = searchInput.Split(' ').Select(s => int.TryParse(s, out int n) ? n : s).ToArray();
 
             int.TryParse(searchInput,out int searchInt);
             
             return await _context.Vehicle
-       .Where(s => s.Brand == searchInput ||
-                   s.Color == searchInput ||
-                   s.Model == searchInput ||
-                   s.RegNum == searchInput ||
-                   searchInputsInt.Any(x => s.WheelsNumber == x) ||
-                   // s.Id == searchInt ||
-                   //(int)s.Type == searchInt).ToListAsync();
-                   searchInputsInt.Any(x => (int)s.Type == x) ||
-                  searchInputsInt.Any(x => s.Id == x)).ToListAsync();
+               .Where(s => s.Brand == searchInput ||
+                           s.Color == searchInput ||
+                           s.Model == searchInput ||
+                           s.RegNum == searchInput ||
+                           searchInputsInt.Any(x => s.WheelsNumber == x) ||
+                           // s.Id == searchInt ||
+                           //(int)s.Type == searchInt).ToListAsync();
+                           searchInputsInt.Any(x => (int)s.Type == x) ||
+                           searchInputsInt.Any(x => s.Id == x)).ToListAsync();
 
             //return await _context.Vehicle
             //       .Where(s => s.Brand == searchInput ||
