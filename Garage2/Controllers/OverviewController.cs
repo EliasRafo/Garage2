@@ -39,6 +39,8 @@ namespace Garage2.Controllers
             int count = await _context.Vehicle.CountAsync();
             overviewViewModel.FreeSpaces = overviewViewModel.Capacity - count;
 
+            overviewViewModel.ParkingSpaces = await GetParkingSpaces();
+
             return View(nameof(Index), overviewViewModel);
         }
 
@@ -64,6 +66,41 @@ namespace Garage2.Controllers
             }
 
             return revenues;
+        }
+
+        public async Task<List<ParkingSpace>> GetParkingSpaces()
+        {
+            List<ParkingSpace> parkingSpaces = new List<ParkingSpace>();
+
+            var vehicles = await _context.Vehicle.ToListAsync();
+            int Capacity;
+
+            if (int.TryParse(_iConfig.GetSection("Garage").GetSection("Capacity").Value, out int result))
+                Capacity = result;
+            else
+                Capacity = 0;
+
+            for (int i = 1; i <= Capacity; i++) 
+            {
+                var v = vehicles.Where(e => e.Address == i).FirstOrDefault();
+                ParkingSpace parkingSpace = new ParkingSpace();
+
+                if (v is null)
+                {
+                    parkingSpace.Id = i;
+                    parkingSpace.Reserved = false;
+                    parkingSpace.Vehicle = null;
+                }
+                else
+                {
+                    parkingSpace.Id = i;
+                    parkingSpace.Reserved = true;
+                    parkingSpace.Vehicle = v;
+                }
+                parkingSpaces.Add(parkingSpace);
+            }
+
+            return parkingSpaces;
         }
     }
 }

@@ -13,5 +13,7 @@ namespace Garage2.Models.ViewModels
 
         public int FreeSpaces { get; set; }
 
+        public List<ParkingSpace> ParkingSpaces { get; set; }
+
     }
 }
