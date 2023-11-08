@@ -72,7 +72,7 @@ namespace Garage2.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Type,RegNum,Color,Brand,Model,WheelsNumber")] Vehicle vehicle)
+        public async Task<IActionResult> Edit(int id, [Bind("VehicleId,Type,RegNum,Color,Brand,Model,WheelsNumber")] Vehicle vehicle)
         {
             if (id != vehicle.VehicleId)
             {
