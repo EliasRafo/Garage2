@@ -93,6 +93,9 @@ namespace Garage2.Controllers
                 {
                     _context.Update(vehicle);
                     await _context.SaveChangesAsync();
+
+                    Feedback feedback = new Feedback() { status = "ok", message = $"Vihecle with registration number {vehicle.RegNum} is now Updated." };
+                    TempData["AlertMessage"] = JsonConvert.SerializeObject(feedback);
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -256,6 +259,9 @@ namespace Garage2.Controllers
                 {
                     _context.Add(vehicle);
                     await _context.SaveChangesAsync();
+                    Feedback feedback = new Feedback() { status = "ok", message = $"Vihecle with registration number {vehicle.RegNum} is now parked at spot {id}." };
+                    TempData["AlertMessage"] = JsonConvert.SerializeObject(feedback);
+
                     return RedirectToAction(nameof(Index),"Overview");
                 }
                 else
