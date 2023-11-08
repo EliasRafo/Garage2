@@ -34,9 +34,9 @@
                         @Html.DisplayFor(modelItem => item.ParkingTime)
                     </td>
                     <td>
-                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                        <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                        <a asp-action="Unparking" asp-route-id="@item.Id">Unparking the vehicle</a>
+                        <a asp-action="Edit" asp-route-id="@item.VehicleId">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@item.VehicleId">Details</a> |
+                        <a asp-action="Unparking" asp-route-id="@item.VehicleId">Unparking the vehicle</a>
                     </td>
                 </tr>
             }   }

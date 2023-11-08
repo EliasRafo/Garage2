@@ -114,7 +114,7 @@ namespace Garage2.Controllers
             }
 
             var vehicle = await _context.Vehicle
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefaultAsync(m => m.VehicleId == id);
             if (vehicle == null)
             {
                 Feedback feedback = new Feedback() { status = "error", message = "Vehicle not found." };
@@ -175,21 +175,21 @@ namespace Garage2.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Park(Vehicle vehicle)
+        public async Task<IActionResult> Park(Vehicle vehicle, int garageID)
         {
             vehicle.ParkingTime = DateTime.Now;
-
+            vehicle.VehicleId = garageID;
             if (ModelState.IsValid)
             {
-                if(!VehicleExists(vehicle))
+                if(!await VehicleExists(vehicle))
                 {
                     _context.Add(vehicle);
                     await _context.SaveChangesAsync();
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction(nameof(Index),"Overview");
                 }
                 else
                 {
-                    Feedback feedback = new Feedback() { status = "ok", message = "Vehicle already exist in the garage." };
+                    Feedback feedback = new Feedback() { status = "ok", message = $"Vehicle with registration number {vehicle.RegNum} already exist in the garage." };
                     TempData["AlertMessage"] = JsonConvert.SerializeObject(feedback);
                 }
                 
@@ -223,42 +223,28 @@ namespace Garage2.Controllers
             return View(nameof(Index), vehicles.ToList());
         }
 
-        private bool VehicleExists(Vehicle vehicle)
+        private async Task<bool> VehicleExists(Vehicle vehicle)
         {
-            return (_context.Vehicle?.Any(e => e.RegNum == vehicle.RegNum)).GetValueOrDefault();
+            return await _context.Vehicle.AnyAsync(e => e.RegNum == vehicle.RegNum);
         }
 
         private async Task <List<Vehicle>> SearchMatchAsync(string searchInput)
         {
 
             ArgumentNullException.ThrowIfNull(searchInput, nameof(searchInput));
-            
-            var searchInputs = searchInput.Split(' ');
-            //change to try parse
-            //int[] searchInputsInt = searchInput.Split(' ').Select(int.Parse).ToArray();
-            var searchInputsInt = searchInput.Split(' ').Select(s => int.TryParse(s, out int n) ? n : s).ToArray();
+           
 
             int.TryParse(searchInput,out int searchInt);
-            
-            return await _context.Vehicle
-               .Where(s => s.Brand == searchInput ||
-                           s.Color == searchInput ||
-                           s.Model == searchInput ||
-                           s.RegNum == searchInput ||
-                           searchInputsInt.Any(x => s.WheelsNumber == x) ||
-                           // s.Id == searchInt ||
-                           //(int)s.Type == searchInt).ToListAsync();
-                           searchInputsInt.Any(x => (int)s.Type == x) ||
-                           searchInputsInt.Any(x => s.Id == x)).ToListAsync();
 
-            //return await _context.Vehicle
-            //       .Where(s => s.Brand == searchInput ||
-            //                   s.Color == searchInput ||
-            //                   s.Model == searchInput ||
-            //                   s.RegNum == searchInput ||
-            //                   s.WheelsNumber == searchInt ||
-            //                   s.Id == searchInt ||
-            //                   (int)s.Type == searchInt).ToListAsync();
+
+            return await _context.Vehicle
+                   .Where(s => s.Brand == searchInput ||
+                               s.Color == searchInput ||
+                               s.Model == searchInput ||
+                               s.RegNum == searchInput ||
+                               s.WheelsNumber == searchInt ||
+                               s.VehicleId == searchInt ||
+                               (int)s.Type == searchInt).ToListAsync();
 
         }
 
