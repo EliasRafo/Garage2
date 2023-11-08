@@ -13,6 +13,8 @@ using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using Garage2.Models.ViewModels;
 using Newtonsoft.Json;
 using static Azure.Core.HttpHeader;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Garage2.Controllers
 {
@@ -72,14 +74,14 @@ namespace Garage2.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Type,RegNum,Color,Brand,Model,WheelsNumber")] Vehicle vehicle)
         {
-            if (id != vehicle.Id)
+            if (id != vehicle.VehicleId)
             {
                 return NotFound();
             }
 
             if (ModelState.IsValid)
             {
-                var vehicleInDb = await _context.Vehicle.AsNoTracking().SingleOrDefaultAsync(v => v.Id == vehicle.Id);
+                var vehicleInDb = await _context.Vehicle.AsNoTracking().SingleOrDefaultAsync(v => v.VehicleId == vehicle.VehicleId);
                 if (vehicleInDb == null)
                 {
                     return NotFound();
@@ -94,7 +96,7 @@ namespace Garage2.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!_context.Vehicle.Any(e => e.Id == vehicle.Id))
+                    if (!_context.Vehicle.Any(e => e.VehicleId == vehicle.VehicleId))
                     {
                         return NotFound();
                     }
@@ -183,7 +185,7 @@ namespace Garage2.Controllers
             }
 
             var vehicle = await _context.Vehicle
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefaultAsync(m => m.VehicleId == id);
             if (vehicle == null)
             {
                 Feedback feedback = new Feedback() { status = "error", message = "Vehicle not found." };
@@ -244,21 +246,21 @@ namespace Garage2.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Park(Vehicle vehicle)
+        public async Task<IActionResult> Park(Vehicle vehicle, int id)
         {
             vehicle.ParkingTime = DateTime.Now;
-
+            vehicle.Address = id;
             if (ModelState.IsValid)
             {
-                if(!VehicleExists(vehicle))
+                if(!await VehicleExists(vehicle))
                 {
                     _context.Add(vehicle);
                     await _context.SaveChangesAsync();
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction(nameof(Index),"Overview");
                 }
                 else
                 {
-                    Feedback feedback = new Feedback() { status = "ok", message = "Vehicle already exist in the garage." };
+                    Feedback feedback = new Feedback() { status = "ok", message = $"Vehicle with registration number {vehicle.RegNum} already exist in the garage." };
                     TempData["AlertMessage"] = JsonConvert.SerializeObject(feedback);
                 }
                 
@@ -268,7 +270,6 @@ namespace Garage2.Controllers
         }
 
         [HttpGet]
-        // Investigate use of async for this action.
         public async Task<IActionResult> Search(string vehicleProp)
         {
 
@@ -280,7 +281,7 @@ namespace Garage2.Controllers
                 return View(nameof(Index));
             }
 
-            var vehicles = Searchmatch(vehicleProp);
+            var vehicles = await SearchMatchAsync(vehicleProp);
 
             if (vehicles.Count == 0)
             {
@@ -293,85 +294,28 @@ namespace Garage2.Controllers
             return View(nameof(Index), vehicles.ToList());
         }
 
-        private bool VehicleExists(Vehicle vehicle)
+        private async Task<bool> VehicleExists(Vehicle vehicle)
         {
-            return (_context.Vehicle?.Any(e => e.RegNum == vehicle.RegNum)).GetValueOrDefault();
+            return await _context.Vehicle.AnyAsync(e => e.RegNum == vehicle.RegNum);
         }
 
-        // Change to async
-        private List<Vehicle> Searchmatch(string searchInput)
+        private async Task <List<Vehicle>> SearchMatchAsync(string searchInput)
         {
-            var contextVehicles =  _context.Vehicle.ToList();
 
-            if (searchInput == null)
-            {
-                return null!;
-            }
+            ArgumentNullException.ThrowIfNull(searchInput, nameof(searchInput));
+           
 
-            int searchInpuInt;
-            Types searchType;
-
-            List<Vehicle>? vehicles = null;
-            List < Vehicle >? vehiclesInt = null;
-            List<Vehicle>? vehiclesString = null; //Brand, Color, RegNum Model
-            List<Vehicle>? vehiclesType = null;
-            //Add search, time of parking event.
-            //List<Vehicle>? vehiclesDateTime = null;
-
-            bool isInt = int.TryParse(searchInput, out searchInpuInt);
-            
-            if(isInt)
-            {
-
-                vehiclesInt = contextVehicles
-                   .Where(s => s.WheelsNumber == searchInpuInt ||
-                               s.Id == searchInpuInt).ToList();
-            }
-
-            vehiclesString = contextVehicles
-                   .Where(s => s.Brand.ToUpper() == searchInput.ToUpper() ||
-                               s.Color.ToUpper() == searchInput.ToUpper() ||
-                               s.Model.ToUpper() == searchInput.ToUpper() ||
-                               s.RegNum.ToUpper() == searchInput.ToUpper()).ToList();
-
-            if (Enum.TryParse<Types>(searchInput, true, out searchType))  // ignore cases
-            {
-                vehiclesType = contextVehicles
-                       .Where(s => s.Type == searchType).ToList();
-            }
-
-            if (vehiclesInt != null)
-            {
-                vehicles = vehiclesInt;
-            }
-
-            if (vehiclesString != null) 
-            {
-                if(vehicles!= null)
-                {
-                    vehicles.AddRange(vehiclesString);
-                }
-                else
-                {
-                    vehicles = vehiclesString;
-                }
-            }
-
-            if (vehiclesType != null)
-            {
-                if (vehicles != null)
-                {
-                    vehicles.AddRange(vehiclesType);
-                }
-                else
-                {
-                    vehicles = vehiclesType;
-                }
-            }
+            int.TryParse(searchInput,out int searchInt);
 
 
-            
-            return vehicles;
+            return await _context.Vehicle
+                   .Where(s => s.Brand == searchInput ||
+                               s.Color == searchInput ||
+                               s.Model == searchInput ||
+                               s.RegNum == searchInput ||
+                               s.WheelsNumber == searchInt ||
+                               s.VehicleId == searchInt ||
+                               (int)s.Type == searchInt).ToListAsync();
         }
 
     }

@@ -5,7 +5,7 @@ namespace Garage2.Models
     public class Vehicle
     {
         [Key]
-        public int Id { get; set; }
+        public int VehicleId { get; set; }
         //Should we use Type or string, what is best practise for SQL? Discuss.
         [Display(Name = "Vehicle type")]
         [Required(ErrorMessage = "Vehicle type is required")] //[EnumDataType(typeof(Types), ErrorMessage = "Vehicle type is required")]
