@@ -1,0 +1,120 @@
+﻿@model Garage2.Models.ViewModels.OverviewViewModel
+
+@{
+    ViewData["Title"] = "Overview";
+}
+
+<h1>Overview</h1>
+
+<div>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Capacity)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Capacity)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.FreeSpaces)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.FreeSpaces)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.VehiclesStatistic)
+        </dt>
+        <dd class="col-sm-10">
+            <ul>
+                @if (Model.VehiclesStatistic is not null)
+                {
+                    @foreach (var item in Model.VehiclesStatistic)
+                    {
+                        <li>@string.Format("Vehicle: {0}, Total={1}", @item.Name, @item.Total)</li>
+                    }
+                }
+                else
+                {
+                    <li>No vehicles found</li>
+                }
+                
+
+            </ul>
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.WheelsNumber)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.WheelsNumber)
+        </dd>
+
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Revenues)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Revenues) SEK
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ParkingSpaces)
+        </dt>
+    </dl>
+
+    <div class="container mt-5">
+        <div class="row">
+
+            @if (Model.ParkingSpaces is not null)
+            {
+                @foreach (var item in Model.ParkingSpaces)
+                {
+                    <div class="col-lg-4 col-md-6 mb-3">
+                        <div class="card py-4 px-lg-5 h-100">
+                            <div class="card-body d-flex flex-column">
+                                <div class="text-center">
+                                    <img src="https://imgs2.dab3games.com/draw-parking-game.png" class="img-fluid  mb-5" alt="">
+                                </div>
+
+                                <div class="card-title mb-4 text-center fs-2">A @item.Id</div>
+                                <div>
+                                    
+                                        @if(item.Reserved == true)
+                                        {
+                                        <ul class="list-unstyled">
+                                            <li class="mb-3">
+                                                <i class="fas fa-check-circle icon-color"></i>
+                                                <span class="small ms-3">Registration number: @item.Vehicle.RegNum</span>
+                                            </li>
+                                            <li class="mb-3">
+                                                <i class="fas fa-check-circle icon-color"></i>
+                                                <span class="small ms-3">Vehicle typr @item.Vehicle.Type</span>
+                                            </li>
+                                            <li class="mb-3">
+                                                <i class="fas fa-check-circle icon-color"></i>
+                                                <span class="small ms-3">Parking time @item.Vehicle.ParkingTime</span>
+                                            </li>
+                                        </ul>
+
+                                        <a class="btn btn-danger" asp-controller="Vehicles" asp-action="Unparking" asp-route-id="@item.Vehicle.Id">Unparking</a>
+                                    }
+                                    else
+                                    {
+                                        <a class="btn btn-success" asp-controller="Vehicles" asp-action="Park" asp-route-id="@item.Id">Park vehicle</a>
+                                    }
+
+                                </div>
+                               
+
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                    
+                }
+            }
+
+        </div>
+    </div>
+   
+</div>
+

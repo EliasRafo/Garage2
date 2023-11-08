@@ -1,3 +1,4 @@
+
 namespace Garage2.Models
 {
     public class ErrorViewModel

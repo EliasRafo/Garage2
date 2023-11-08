@@ -27,7 +27,6 @@ namespace Garage2.Controllers
             _context = context;
         }
 
-        // GET: Vehicles
         public async Task<IActionResult> Index()
         {
             if (_context.Vehicle != null)
@@ -42,6 +41,76 @@ namespace Garage2.Controllers
                 return View();
             }
         }
+
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
+                return StatusCode(StatusCodes.Status400BadRequest);
+            }
+            var vehicle = await _context.Vehicle.FindAsync(id);
+            if (vehicle == null)
+            {
+                return NotFound();
+            }
+            return View(vehicle);
+        }
+
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null)
+            {
+                return StatusCode(StatusCodes.Status400BadRequest);
+            }
+            var vehicle = await _context.Vehicle.FindAsync(id);
+            if (vehicle == null)
+            {
+                return NotFound();
+            }
+            return View(vehicle);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Type,RegNum,Color,Brand,Model,WheelsNumber")] Vehicle vehicle)
+        {
+            if (id != vehicle.Id)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                var vehicleInDb = await _context.Vehicle.AsNoTracking().SingleOrDefaultAsync(v => v.Id == vehicle.Id);
+                if (vehicleInDb == null)
+                {
+                    return NotFound();
+                }
+
+                vehicle.ParkingTime = vehicleInDb.ParkingTime;
+
+                try
+                {
+                    _context.Update(vehicle);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!_context.Vehicle.Any(e => e.Id == vehicle.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            return View(vehicle);
+        }
+           
+             
 
         // GET: Sort
         public async Task<IActionResult> Sort(string sortOrder)
@@ -100,6 +169,8 @@ namespace Garage2.Controllers
 
                 return View("Index");
             }
+
+            //Testing
         }
 
         // GET: Vehicles/Unparking/5
@@ -246,6 +317,55 @@ namespace Garage2.Controllers
                                s.VehicleId == searchInt ||
                                (int)s.Type == searchInt).ToListAsync();
 
+                vehiclesInt = contextVehicles
+                   .Where(s => s.WheelsNumber == searchInpuInt ||
+                               s.Id == searchInpuInt).ToList();
+            }
+
+            vehiclesString = contextVehicles
+                   .Where(s => s.Brand.ToUpper() == searchInput.ToUpper() ||
+                               s.Color.ToUpper() == searchInput.ToUpper() ||
+                               s.Model.ToUpper() == searchInput.ToUpper() ||
+                               s.RegNum.ToUpper() == searchInput.ToUpper()).ToList();
+
+            if (Enum.TryParse<Types>(searchInput, true, out searchType))  // ignore cases
+            {
+                vehiclesType = contextVehicles
+                       .Where(s => s.Type == searchType).ToList();
+            }
+
+            if (vehiclesInt != null)
+            {
+                vehicles = vehiclesInt;
+            }
+
+            if (vehiclesString != null) 
+            {
+                if(vehicles!= null)
+                {
+                    vehicles.AddRange(vehiclesString);
+                }
+                else
+                {
+                    vehicles = vehiclesString;
+                }
+            }
+
+            if (vehiclesType != null)
+            {
+                if (vehicles != null)
+                {
+                    vehicles.AddRange(vehiclesType);
+                }
+                else
+                {
+                    vehicles = vehiclesType;
+                }
+            }
+
+
+            
+            return vehicles;
         }
 
     }
