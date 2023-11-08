@@ -246,10 +246,10 @@ namespace Garage2.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Park(Vehicle vehicle, int garageID)
+        public async Task<IActionResult> Park(Vehicle vehicle, int id)
         {
             vehicle.ParkingTime = DateTime.Now;
-            vehicle.VehicleId = garageID;
+            vehicle.Address = id;
             if (ModelState.IsValid)
             {
                 if(!await VehicleExists(vehicle))

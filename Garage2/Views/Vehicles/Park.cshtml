@@ -6,6 +6,12 @@
 
 <h1>Park</h1>
 
+@if (@TempData["AlertMessage"] != null)
+{
+    string message = TempData["AlertMessage"].ToString();
+    <message message="@message"></message>
+}
+
 <h4>Vehicle</h4>
 <hr />
 <div class="row">
