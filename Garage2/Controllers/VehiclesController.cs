@@ -309,10 +309,15 @@ namespace Garage2.Controllers
         {
 
             ArgumentNullException.ThrowIfNull(searchInput, nameof(searchInput));
-           
 
-            int.TryParse(searchInput,out int searchInt);
+            
 
+            bool FilterTypes = int.TryParse(searchInput,out int searchInt);
+
+            //Fix optimize:
+            if (!FilterTypes)
+            {
+                Enum.TryParse<Types>(searchInput, true, out Types searchType);
 
             return await _context.Vehicle
                    .Where(s => s.Brand == searchInput ||
@@ -320,8 +325,20 @@ namespace Garage2.Controllers
                                s.Model == searchInput ||
                                s.RegNum == searchInput ||
                                s.WheelsNumber == searchInt ||
-                               s.VehicleId == searchInt ||
-                               (int)s.Type == searchInt).ToListAsync();
+                               //s.VehicleId == searchInt ||
+                               //(int)s.Type == searchInt).ToListAsync();
+                               s.Type == searchType).ToListAsync();
+            }
+            else
+            {
+                return await _context.Vehicle
+                                   .Where(s => s.Brand == searchInput ||
+                                               s.Color == searchInput ||
+                                               s.Model == searchInput ||
+                                               s.RegNum == searchInput ||
+                                               s.WheelsNumber == searchInt)
+                                               .ToListAsync();
+            }
         }
 
     }
