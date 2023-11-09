@@ -6,6 +6,12 @@
 
 <h1>Overview</h1>
 
+@if (@TempData["AlertMessage"] != null)
+{
+    string message = TempData["AlertMessage"].ToString();
+    <message message="@message"></message>
+}
+
 <div>
     <hr />
     <dl class="row">
@@ -93,7 +99,7 @@
                                             </li>
                                         </ul>
 
-                                        <a class="btn btn-danger" asp-controller="Vehicles" asp-action="Unparking" asp-route-id="@item.Vehicle.Id">Unparking</a>
+                                        <a class="btn btn-danger" asp-controller="Vehicles" asp-action="Unparking" asp-route-id="@item.Vehicle.VehicleId">Unparking</a>
                                     }
                                     else
                                     {
