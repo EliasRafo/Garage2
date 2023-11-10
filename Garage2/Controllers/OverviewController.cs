@@ -85,6 +85,7 @@ namespace Garage2.Controllers
             {
                 var vehic = vehicles.Where(e => e.Address == i); //Comment Development of size of parking spots.FirstOrDefault();
                 ParkingSpace parkingSpace = new ParkingSpace();
+                //Think about foreach, move size of lot/asigning of lot to here?
                 foreach(var v in vehic)
                 { 
                     if (v is null)
@@ -98,6 +99,7 @@ namespace Garage2.Controllers
                     {
                         parkingSpace.Id = i;
                         parkingSpace.Vehicle = v;
+                        //Should be moved
                         int parkingSize = 0;
                         if (parkingSpace.SpaceOccupied != SizeData.Full)
                         {
@@ -107,7 +109,8 @@ namespace Garage2.Controllers
                         if (parkingSpace.SpaceOccupied == SizeData.Full)
                         {
                             parkingSpace.Reserved = true;
-                        } 
+                        }
+                        //Should be moved.
                     }
                     parkingSpaces.Add(parkingSpace);
                 }
