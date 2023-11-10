@@ -90,7 +90,8 @@ namespace Garage2.Controllers
                     parkingSpace.Id = i;
                     parkingSpace.Reserved = false;
                     parkingSpace.Vehicle = null;
-                }
+                    parkingSpace.SpaceOccupied[i] = SizeData.Empty; 
+    }
                 else
                 {
                     parkingSpace.Id = i;
