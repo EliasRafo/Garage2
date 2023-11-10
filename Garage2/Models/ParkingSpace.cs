@@ -8,8 +8,8 @@ namespace Garage2.Models
         public bool Reserved { get; set; }
 
         public Vehicle? Vehicle { get; set; }
-
-        public int[]? spaceOccupied { get; set; }
+        [Range(0, 3)]
+        public int? SpaceOccupied { get; set; }
 
     }
 }

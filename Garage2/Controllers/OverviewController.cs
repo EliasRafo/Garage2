@@ -76,7 +76,7 @@ namespace Garage2.Controllers
             var vehicles = await _context.Vehicle.ToListAsync();
             int Capacity;
 
-            if (int.TryParse(_iConfig.GetSection("Garage").GetSection("Capacity").Value, out int result))
+            if (int.TryParse(_iConfig.GetSection("Garage").GetSection("Capacity").Value, out int result)) 
                 Capacity = result;
             else
                 Capacity = 0;
@@ -84,27 +84,30 @@ namespace Garage2.Controllers
             for (int i = 1; i <= Capacity; i++) 
             {
                 var v = vehicles.Where(e => e.Address == i).FirstOrDefault();
-                ParkingSpace parkingSpace = new ParkingSpace();
+                //test moved during size
+                    ParkingSpace parkingSpace = new ParkingSpace();
 
                 if (v is null)
                 {
                     parkingSpace.Id = i;
                     parkingSpace.Reserved = false;
                     parkingSpace.Vehicle = null;
-                    parkingSpace.SpaceOccupied[i] = SizeData.Empty; 
-    }
+                    parkingSpace.SpaceOccupied = SizeData.Empty; 
+                }
                 else
                 {
-                    int parkingSize = 0;
-                    if (parkingSpace.SpaceOccupied[i] == SizeData.Empty)
-                    {
-                         parkingSize = SizeData.AssignSize(v.Type);
-                    }
-
-                    parkingSpace.SpaceOccupied[i] = parkingSize;
                     parkingSpace.Id = i;
-                    parkingSpace.Reserved = true;
                     parkingSpace.Vehicle = v;
+                    int parkingSize = 0;
+                    if (parkingSpace.SpaceOccupied != SizeData.Full)
+                    {
+                        parkingSize = SizeData.AssignSize(v.Type);
+                        parkingSpace.SpaceOccupied = parkingSize;
+                    }
+                    if (parkingSpace.SpaceOccupied == SizeData.Full)
+                    {
+                        parkingSpace.Reserved = true;
+                    } 
                 }
                 parkingSpaces.Add(parkingSpace);
             }
