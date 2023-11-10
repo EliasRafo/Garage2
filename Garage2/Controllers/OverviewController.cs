@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using System.Configuration;
 using static Microsoft.Extensions.Logging.EventSource.LoggingEventSource;
 using System.Runtime.Intrinsics.X86;
+using System.Reflection.Emit;
 
 namespace Garage2.Controllers
 {
@@ -94,6 +95,13 @@ namespace Garage2.Controllers
     }
                 else
                 {
+                    int parkingSize = 0;
+                    if (parkingSpace.SpaceOccupied[i] == SizeData.Empty)
+                    {
+                         parkingSize = SizeData.AssignSize(v.Type);
+                    }
+
+                    parkingSpace.SpaceOccupied[i] = parkingSize;
                     parkingSpace.Id = i;
                     parkingSpace.Reserved = true;
                     parkingSpace.Vehicle = v;

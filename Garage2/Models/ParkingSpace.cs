@@ -9,8 +9,7 @@ namespace Garage2.Models
 
         public Vehicle? Vehicle { get; set; }
 
-        [Range(0, 3)]
-        public int[]? SpaceOccupied { get; set; }
+        public int[]? spaceOccupied { get; set; }
 
     }
 }
