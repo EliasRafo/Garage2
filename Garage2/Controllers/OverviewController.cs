@@ -81,35 +81,36 @@ namespace Garage2.Controllers
             else
                 Capacity = 0;
 
-            for (int i = 1; i <= Capacity; i++) 
+            for (int i = 1; i <= Capacity* SizeData.Full; i++) 
             {
-                var v = vehicles.Where(e => e.Address == i).FirstOrDefault();
-                //test moved during size
-                    ParkingSpace parkingSpace = new ParkingSpace();
-
-                if (v is null)
-                {
-                    parkingSpace.Id = i;
-                    parkingSpace.Reserved = false;
-                    parkingSpace.Vehicle = null;
-                    parkingSpace.SpaceOccupied = SizeData.Empty; 
-                }
-                else
-                {
-                    parkingSpace.Id = i;
-                    parkingSpace.Vehicle = v;
-                    int parkingSize = 0;
-                    if (parkingSpace.SpaceOccupied != SizeData.Full)
+                var vehic = vehicles.Where(e => e.Address == i); //Comment Development of size of parking spots.FirstOrDefault();
+                ParkingSpace parkingSpace = new ParkingSpace();
+                foreach(var v in vehic)
+                { 
+                    if (v is null)
                     {
-                        parkingSize = SizeData.AssignSize(v.Type);
-                        parkingSpace.SpaceOccupied = parkingSize;
+                        parkingSpace.Id = i;
+                        parkingSpace.Reserved = false;
+                        parkingSpace.Vehicle = null;
+                        parkingSpace.SpaceOccupied = SizeData.Empty; 
                     }
-                    if (parkingSpace.SpaceOccupied == SizeData.Full)
+                    else
                     {
-                        parkingSpace.Reserved = true;
-                    } 
+                        parkingSpace.Id = i;
+                        parkingSpace.Vehicle = v;
+                        int parkingSize = 0;
+                        if (parkingSpace.SpaceOccupied != SizeData.Full)
+                        {
+                            parkingSize = SizeData.AssignSize(v.Type);
+                            parkingSpace.SpaceOccupied += parkingSize;
+                        }
+                        if (parkingSpace.SpaceOccupied == SizeData.Full)
+                        {
+                            parkingSpace.Reserved = true;
+                        } 
+                    }
+                    parkingSpaces.Add(parkingSpace);
                 }
-                parkingSpaces.Add(parkingSpace);
             }
 
             return parkingSpaces;

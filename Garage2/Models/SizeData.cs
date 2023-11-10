@@ -42,7 +42,8 @@ namespace Garage2.Models
                     break;
 
                 default:
-                    throw new ArgumentException($"Vehicletyp {vehicleType} is not recognized.");
+                    size = 0;
+                    break;
             }
             return size;
 
