@@ -8,6 +8,7 @@ using System.Configuration;
 using static Microsoft.Extensions.Logging.EventSource.LoggingEventSource;
 using System.Runtime.Intrinsics.X86;
 using System.Reflection.Emit;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Garage2.Controllers
 {
@@ -81,38 +82,48 @@ namespace Garage2.Controllers
             else
                 Capacity = 0;
 
-            for (int i = 1; i <= Capacity* SizeData.Full; i++) 
+            ParkingSpace parkingSpace;
+
+            for (int i = 1; i <= Capacity; i++) 
             {
-                var vehic = vehicles.Where(e => e.Address == i); //Comment Development of size of parking spots.FirstOrDefault();
-                ParkingSpace parkingSpace = new ParkingSpace();
+                var vehic = vehicles.Where(e => e.Address == i).AsEnumerable(); //Comment Development of size of parking spots.FirstOrDefault();
+                parkingSpace = new ParkingSpace();
                 //Think about foreach, move size of lot/asigning of lot to here?
-                foreach(var v in vehic)
-                { 
-                    if (v is null)
-                    {
-                        parkingSpace.Id = i;
-                        parkingSpace.Reserved = false;
-                        parkingSpace.Vehicle = null;
-                        parkingSpace.SpaceOccupied = SizeData.Empty; 
-                    }
-                    else
+                if (vehic.IsNullOrEmpty())
+                {
+                    parkingSpace.Id = i;
+                    parkingSpace.Reserved = false;
+                    parkingSpace.Vehicle = null;
+                    parkingSpace.SpaceOccupied = SizeData.Empty;
+                    parkingSpaces.Add(parkingSpace);
+                }
+                else
+                {
+                    int parkingSize = 0;
+                    foreach (var v in vehic)
                     {
                         parkingSpace.Id = i;
                         parkingSpace.Vehicle = v;
-                        //Should be moved
-                        int parkingSize = 0;
+                        //insert into methood switchcase for sizes 1 3 and 9(motorcycle, car, boat)
+                       
                         if (parkingSpace.SpaceOccupied != SizeData.Full)
                         {
                             parkingSize = SizeData.AssignSize(v.Type);
+                            if(parkingSpace.SpaceOccupied != null)
                             parkingSpace.SpaceOccupied += parkingSize;
+                            else
+                            parkingSpace.SpaceOccupied = parkingSize;
+                            parkingSpaces.Add(parkingSpace);
                         }
                         if (parkingSpace.SpaceOccupied == SizeData.Full)
                         {
                             parkingSpace.Reserved = true;
                         }
-                        //Should be moved.
+                        //insert into methood switchcase for sizes 1 3 and 9(motorcycle, car, boat)
+
+
                     }
-                    parkingSpaces.Add(parkingSpace);
+
                 }
             }
 
